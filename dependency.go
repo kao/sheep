@@ -37,7 +37,7 @@ var dependenciesMap = map[string]*Dependency{
 		},
 		Env: []string{},
 		Information: []string{
-			"URL: localhost:6379",
+			"Listener: localhost:6379",
 		},
 	},
 }

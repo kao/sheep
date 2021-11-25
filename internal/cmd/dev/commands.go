@@ -13,6 +13,7 @@ func NewDevCommands(app *sheep.App) *cli.Command {
 		Subcommands: []*cli.Command{
 			newStartCommand(app),
 			newStopCommand(app),
+			NewInformationCommand(app),
 		},
 	}
 }
