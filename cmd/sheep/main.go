@@ -1,28 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"sheep"
-	"sheep/internal/cmd/dev"
+	"sheep/internal/cmd"
 
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := &cli.App{
-		Commands: []*cli.Command{
-			{
-				Name:  "version",
-				Usage: "display sheep version",
-				Action: func(c *cli.Context) error {
-					fmt.Println(sheep.Version)
-					return nil
-				},
-			},
-			dev.NewDevCommands(),
-		},
+		Commands: cmd.NewCommands(),
 	}
 
 	err := app.Run(os.Args)
