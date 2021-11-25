@@ -2,7 +2,7 @@ package dev
 
 import (
 	"context"
-	"mcc/internal/docker"
+	"sheep/internal/docker"
 
 	"github.com/docker/docker/api/types"
 	"github.com/sirupsen/logrus"

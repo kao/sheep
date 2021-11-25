@@ -1,7 +1,7 @@
 package dev
 
 import (
-	"mcc/internal/docker"
+	"sheep/internal/docker"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"

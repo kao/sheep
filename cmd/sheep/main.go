@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"mcc"
-	"mcc/internal/cmd/dev"
 	"os"
+	"sheep"
+	"sheep/internal/cmd/dev"
 
 	"github.com/urfave/cli/v2"
 )
@@ -15,9 +15,9 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:  "version",
-				Usage: "display mcc version",
+				Usage: "display sheep version",
 				Action: func(c *cli.Context) error {
-					fmt.Println(mcc.Version)
+					fmt.Println(sheep.Version)
 					return nil
 				},
 			},
