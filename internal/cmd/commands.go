@@ -8,10 +8,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func NewCommands() []*cli.Command {
+func NewCommands(app *sheep.App) []*cli.Command {
 	return []*cli.Command{
 		newVersionCommand(),
-		dev.NewDevCommands(),
+		dev.NewDevCommands(app),
 	}
 }
 

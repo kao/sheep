@@ -3,15 +3,13 @@ package main
 import (
 	"log"
 	"os"
+	"sheep"
 	"sheep/internal/cmd"
-
-	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	app := &cli.App{
-		Commands: cmd.NewCommands(),
-	}
+	app := sheep.NewApp()
+	app.Commands = cmd.NewCommands(app)
 
 	err := app.Run(os.Args)
 	if err != nil {

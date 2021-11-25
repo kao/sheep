@@ -2,6 +2,7 @@ package dev
 
 import (
 	"context"
+	"sheep"
 	"sheep/internal/docker"
 
 	"github.com/docker/docker/api/types"
@@ -9,13 +10,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func newUpCommand() *cli.Command {
+func newStartCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
-		Name:  "up",
+		Name:  "start",
 		Usage: "start a Mooncard's dependency container",
 		Action: func(ctx *cli.Context) error {
 			name := ctx.Args().Get(0)
-			dep := docker.DependenciesMap[name]
+			dep := app.DependenciesCfg[name]
 			// TODO check if dep exists
 
 			c, err := docker.NewClient()

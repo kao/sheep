@@ -1,13 +1,14 @@
 package dev
 
 import (
+	"sheep"
 	"sheep/internal/docker"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
-func newDownCommand() *cli.Command {
+func newStopCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
 		Name:  "down",
 		Usage: "stop a Mooncard's dependency container",

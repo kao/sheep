@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"sheep"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -44,8 +45,8 @@ func (c *Client) FindContainer(ctx context.Context, name string) (*types.Contain
 	return &containers[0], nil
 }
 
-func (c *Client) PullImageAndCreateContainer(ctx context.Context, dep *dockerContainer) (string, error) {
-	out, err := c.ImagePull(ctx, dep.image, types.ImagePullOptions{})
+func (c *Client) PullImageAndCreateContainer(ctx context.Context, dep *sheep.Dependency) (string, error) {
+	out, err := c.ImagePull(ctx, dep.Image, types.ImagePullOptions{})
 	if err != nil {
 		return "", errors.Wrap(err, "unable to pull Docker image")
 	}
@@ -54,13 +55,13 @@ func (c *Client) PullImageAndCreateContainer(ctx context.Context, dep *dockerCon
 	cont, err := c.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image: dep.image,
-			Env:   dep.env,
+			Image: dep.Image,
+			Env:   dep.Env,
 		},
-		&container.HostConfig{PortBindings: dep.ports},
+		&container.HostConfig{PortBindings: dep.Ports},
 		nil,
 		nil,
-		dep.name)
+		dep.Name)
 	if err != nil {
 		return "", errors.Wrap(err, "unable to create container")
 	}
