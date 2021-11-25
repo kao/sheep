@@ -27,6 +27,23 @@ var dependenciesMap = map[string]*Dependency{
 			"URI: postgres:password@localhost:5432/postgres",
 		},
 	},
+	"rabbitmq": {
+		Name:  "mooncard-rabbitmq",
+		Image: "rabbitmq:3.9.10-management-alpine",
+		Ports: nat.PortMap{
+			"5672/tcp": {
+				{HostPort: "5672"},
+			},
+			"15672/tcp": {
+				{HostPort: "15672"},
+			},
+		},
+		Information: []string{
+			"Listener: localhost:5672",
+			"WebUI: http://localhost:15672",
+			"Credentials: guest/guest",
+		},
+	},
 	"redis": {
 		Name:  "mooncard-redis",
 		Image: "redis:6.2-alpine",

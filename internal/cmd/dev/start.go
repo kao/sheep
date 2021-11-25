@@ -2,8 +2,10 @@ package dev
 
 import (
 	"context"
+	"errors"
 	"sheep"
 	"sheep/internal/docker"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/sirupsen/logrus"
@@ -40,15 +42,23 @@ func newStartCommand(app *sheep.App) *cli.Command {
 					return err
 				}
 			} else {
+				if container.Status != "" && strings.Contains(container.Status, "Up") {
+					logger.Error("container already running")
+					return errors.New("container already running")
+				}
 				containerID = container.ID
 			}
 
 			logger.Info("starting container")
+
 			if err := c.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{}); err != nil {
 				logger.Info("unable to start container")
 				return nil
 			}
+
 			logger.Info("container started")
+
+			printDependencyInformation(dep)
 
 			return nil
 		},

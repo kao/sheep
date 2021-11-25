@@ -10,7 +10,7 @@ import (
 
 func newStopCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
-		Name:  "down",
+		Name:  "stop",
 		Usage: "stop a Mooncard's dependency container",
 		Action: func(ctx *cli.Context) error {
 			name := ctx.Args().Get(0)
