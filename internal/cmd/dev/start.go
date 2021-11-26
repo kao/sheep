@@ -1,13 +1,11 @@
 package dev
 
 import (
-	"context"
-	"errors"
 	"sheep"
 	"sheep/internal/docker"
 	"strings"
 
-	"github.com/docker/docker/api/types"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -15,50 +13,37 @@ import (
 func newStartCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
 		Name:  "start",
-		Usage: "start a Mooncard's dependency container",
+		Usage: "start a Sheep's dependency",
 		Action: func(ctx *cli.Context) error {
-			name := ctx.Args().Get(0)
-			dep := app.DependenciesCfg[name]
-			// TODO check if dep exists
-
 			c, err := docker.NewClient()
 			if err != nil {
 				return err
 			}
 
-			logger := logrus.WithField("container", name)
-			logger.Info("looking for container")
-			container, err := c.FindContainer(ctx.Context, name)
-			if err != nil {
-				logger.Error("unable to find the container")
-				return err
-			}
-
-			var containerID string
-			if container == nil {
-				logger.Info("pulling image and creating the container")
-				containerID, err = c.PullImageAndCreateContainer(ctx.Context, dep)
-				if err != nil {
-					return err
+			name := ctx.Args().Get(0)
+			for _, d := range app.DependenciesCfg {
+				if name != "" && name != strings.TrimPrefix(d.Name, "sheep-") {
+					continue
 				}
-			} else {
-				if container.Status != "" && strings.Contains(container.Status, "Up") {
-					logger.Error("container already running")
-					return errors.New("container already running")
+
+				logger := logrus.WithField("dependency", d.Name)
+				logger.Info("starting dependency")
+
+				if err := c.StartContainer(ctx.Context, d); err != nil {
+					err = errors.Wrap(err, "unable to start dependency")
+
+					if name != "" && name != strings.TrimPrefix(d.Name, "sheep-") {
+						return err
+					} else {
+						logger.Error(err)
+						continue
+					}
 				}
-				containerID = container.ID
+
+				logger.Info("dependency started")
+
+				printDependencyInformation(d)
 			}
-
-			logger.Info("starting container")
-
-			if err := c.ContainerStart(context.Background(), containerID, types.ContainerStartOptions{}); err != nil {
-				logger.Info("unable to start container")
-				return nil
-			}
-
-			logger.Info("container started")
-
-			printDependencyInformation(dep)
 
 			return nil
 		},

@@ -3,7 +3,9 @@ package dev
 import (
 	"sheep"
 	"sheep/internal/docker"
+	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -11,35 +13,34 @@ import (
 func newStopCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
 		Name:  "stop",
-		Usage: "stop a Mooncard's dependency container",
+		Usage: "stop a Sheep's dependency",
 		Action: func(ctx *cli.Context) error {
-			name := ctx.Args().Get(0)
-			// TODO check if dep exists
-
 			c, err := docker.NewClient()
 			if err != nil {
 				return err
 			}
 
-			logger := logrus.WithField("container", name)
-			logger.Info("looking for container")
-			container, err := c.FindContainer(ctx.Context, name)
-			if err != nil {
-				logger.Error("unable to find the container")
-				return err
-			}
+			name := ctx.Args().Get(0)
+			for _, d := range app.DependenciesCfg {
+				if name != "" && name != strings.TrimPrefix(d.Name, "sheep-") {
+					continue
+				}
 
-			if container.State == "exited" {
-				logger.Info("dependency already down")
-				return nil
-			}
+				logger := logrus.WithField("dependency", d.Name)
 
-			logger.Info("stopping container")
-			if err := c.ContainerStop(ctx.Context, container.ID, nil); err != nil {
-				logger.Info("unable to stop container")
-				return nil
+				logger.Info("stopping dependency")
+				if err := c.StopContainer(ctx.Context, d.Name); err != nil {
+					err = errors.Wrap(err, "unable to stop the dependency")
+
+					if name != "" && name != strings.TrimPrefix(d.Name, "sheep-") {
+						return err
+					} else {
+						logger.Error(err)
+						continue
+					}
+				}
+				logger.Info("dependency stopped")
 			}
-			logger.Info("container stopped")
 
 			return nil
 		},

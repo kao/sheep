@@ -12,7 +12,7 @@ import (
 func NewInformationCommand(app *sheep.App) *cli.Command {
 	return &cli.Command{
 		Name:  "info",
-		Usage: "show Mooncard's dependency information",
+		Usage: "show Sheep's dependency information",
 		Action: func(ctx *cli.Context) error {
 			name := ctx.Args().Get(0)
 
@@ -20,11 +20,10 @@ func NewInformationCommand(app *sheep.App) *cli.Command {
 				for _, d := range app.DependenciesCfg {
 					printDependencyInformation(d)
 				}
-
 			} else {
 				dep := app.DependenciesCfg[name]
 				if dep == nil {
-					return errors.New("unknow dependency")
+					return errors.New("unknown dependency")
 				}
 
 				printDependencyInformation(dep)
@@ -40,7 +39,7 @@ func printDependencyInformation(d *sheep.Dependency) {
 		return
 	}
 
-	fmt.Printf("%s\n", strings.TrimPrefix(d.Name, "mooncard-"))
+	fmt.Printf("%s\n", strings.TrimPrefix(d.Name, "sheep-"))
 	for _, i := range d.Information {
 		fmt.Printf("  -> %s\n", i)
 	}

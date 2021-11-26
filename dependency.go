@@ -12,8 +12,8 @@ type Dependency struct {
 
 var dependenciesMap = map[string]*Dependency{
 	"postgres": {
-		Name:  "mooncard-postgres",
-		Image: "postgres:12-alpine",
+		Name:  "sheep-postgres",
+		Image: "postgres:14.1-alpine",
 		Ports: nat.PortMap{
 			"5432/tcp": {
 				{HostPort: "5432"},
@@ -28,7 +28,7 @@ var dependenciesMap = map[string]*Dependency{
 		},
 	},
 	"rabbitmq": {
-		Name:  "mooncard-rabbitmq",
+		Name:  "sheep-rabbitmq",
 		Image: "rabbitmq:3.9.10-management-alpine",
 		Ports: nat.PortMap{
 			"5672/tcp": {
@@ -45,7 +45,7 @@ var dependenciesMap = map[string]*Dependency{
 		},
 	},
 	"redis": {
-		Name:  "mooncard-redis",
+		Name:  "sheep-redis",
 		Image: "redis:6.2-alpine",
 		Ports: nat.PortMap{
 			"6379/tcp": {

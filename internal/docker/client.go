@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"sheep"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -24,6 +25,32 @@ func NewClient() (*Client, error) {
 	}
 
 	return &Client{c}, nil
+}
+
+func (c *Client) StartContainer(ctx context.Context, dep *sheep.Dependency) error {
+	container, err := c.FindContainer(ctx, dep.Name)
+	if err != nil {
+		return errors.Wrap(err, "unable to find the container")
+	}
+
+	var containerID string
+	if container == nil {
+		containerID, err = c.PullImageAndCreateContainer(ctx, dep)
+		if err != nil {
+			return err
+		}
+	} else {
+		if container.Status != "" && strings.Contains(container.Status, "Up") {
+			return errors.New("container already running")
+		}
+		containerID = container.ID
+	}
+
+	if err := c.ContainerStart(ctx, containerID, types.ContainerStartOptions{}); err != nil {
+		return errors.Wrap(err, "unable to start container")
+	}
+
+	return nil
 }
 
 func (c *Client) FindContainer(ctx context.Context, name string) (*types.Container, error) {
@@ -67,4 +94,21 @@ func (c *Client) PullImageAndCreateContainer(ctx context.Context, dep *sheep.Dep
 	}
 
 	return cont.ID, nil
+}
+
+func (c *Client) StopContainer(ctx context.Context, name string) error {
+	container, err := c.FindContainer(ctx, name)
+	if err != nil {
+		return errors.Wrap(err, "unable to find the container")
+	}
+
+	if container.State == "exited" {
+		return errors.New("dependency already stopped")
+	}
+
+	if err := c.ContainerStop(ctx, container.ID, nil); err != nil {
+		return errors.Wrap(err, "unable to stop container")
+	}
+
+	return nil
 }
